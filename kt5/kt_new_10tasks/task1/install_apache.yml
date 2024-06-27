@@ -1,0 +1,33 @@
+---
+- name: Установка и настройка веб-сервера Apache
+  hosts: your_target_server
+  become: yes
+
+  tasks:
+    - name: Установка Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Создание каталога для веб-сайта
+      file:
+        path: /var/www/my_website
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: "0755"
+
+    - name: Копирование файла конфигурации виртуального хоста
+      copy:
+        src: apache_my_website.conf
+        dest: /etc/apache2/sites-available/my_website.conf
+
+    - name: Активация виртуального хоста
+      command: a2ensite my_website.conf
+      args:
+        creates: /etc/apache2/sites-enabled/my_website.conf
+
+    - name: Перезапуск Apache
+      service:
+        name: apache2
+        state: restarted

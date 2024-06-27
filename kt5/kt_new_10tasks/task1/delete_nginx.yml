@@ -1,0 +1,10 @@
+---
+- name: Удаление Nginx
+  hosts: your_target_server
+  become: yes
+
+  tasks:
+    - name: Удаление пакета Nginx
+      apt:
+        name: nginx
+        state: absent

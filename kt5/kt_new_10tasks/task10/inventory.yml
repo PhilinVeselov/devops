@@ -1,0 +1,5 @@
+all:
+  hosts:
+    your_target_server:
+      ansible_host: secret
+      ansible_ssh_pass: secret

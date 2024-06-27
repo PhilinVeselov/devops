@@ -1,0 +1,17 @@
+---
+- name: Создание резервной копии конфигурационных файлов Apache
+  hosts: your_target_server
+  become: yes  # Для выполнения действий с правами суперпользователя
+
+  tasks:
+    - name: Создание директории для резервных копий
+      file:
+        path: /var/backup
+        state: directory
+        mode: "0755"
+
+    - name: Создание резервной копии файла конфигурации Apache
+      copy:
+        src: /etc/apache2/sites-available/my_website.conf  # Путь к исходному файлу конфигурации
+        dest: /var/backup/apache_my_website.conf.bak  # Путь для сохранения резервной копии
+        backup: yes  # Создание резервной копии перед заменой

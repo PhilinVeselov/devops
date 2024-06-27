@@ -1,0 +1,38 @@
+---
+- name: Установка и настройка веб-сервера
+  hosts: your_target_server
+  become: yes
+
+  tasks:
+    - name: Установка Nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+
+    - name: Создание каталога для наших сайтов
+      file:
+        path: /var/www/my_website
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: "0755"
+
+    - name: Копирование файла конфигурации сайта
+      template:
+        src: files/nginx_site.conf.j2
+        dest: /etc/nginx/sites-available/my_website.conf
+      notify:
+        - Reload Nginx
+
+    - name: Создание символической ссылки для нашего сайта
+      file:
+        src: /etc/nginx/sites-available/my_website.conf
+        dest: /etc/nginx/sites-enabled/my_website.conf
+        state: link
+
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
