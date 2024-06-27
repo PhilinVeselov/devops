@@ -1,0 +1,27 @@
+---
+- name: Управление пользователями и их правами
+  hosts: your_target_server
+  become: yes
+
+  tasks:
+    - name: Добавление нового пользователя
+      user:
+        name: new_user
+        password: "$6$rounds=656000$2qYzXqGJYlzNHdzv$Cm7ZwW./BXZyRvR30imLYr5Z.xbT2yKxIjoYayGKxqizAP6DT2F1XWrz6pvz69y2M7sjp6hNGM2shZymomS0t0"
+        groups: sudo
+        shell: /bin/bash
+
+    - name: Создание каталога для пользователя
+      file:
+        path: /home/new_user
+        state: directory
+        owner: new_user
+        group: new_user
+        mode: "0755"
+
+    - name: Назначение прав доступа для домашнего каталога пользователя
+      file:
+        path: /home/new_user
+        owner: new_user
+        group: new_user
+        mode: "0755"

@@ -1,0 +1,60 @@
+---
+- name: Мой Playbook для развёртывания Flask веб-приложения из репозитория Git
+  hosts: your_target_server
+  become: yes
+  tasks:
+    # Установка Git для клонирования репозитория
+    - name: Установка Git
+      apt:
+        name: git
+        state: present
+
+    # Клонирование Git-репозитория
+    - name: Клонирование Git-репозитория
+      git:
+        repo: https://github.com/mmumshad/simple-webapp-flask.git
+        dest: /opt/simple-webapp-flask
+        force: yes
+
+    # Установка Python и его зависимостей
+    - name: Установка Python и его зависимостей
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python3
+        - python3-pip
+        - python3-dev
+        - build-essential
+
+    # Установка Flask с помощью apt
+    - name: Установка Flask с помощью apt
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python3-flask
+      when: ansible_distribution == 'Ubuntu'
+
+    # Установка MySQL-клиента для Python через pip
+    - name: Установка MySQL-клиента для Python через pip
+      pip:
+        name: mysql-connector-python
+        state: present
+      become: yes
+      when: ansible_distribution != 'Ubuntu'  # Для других дистрибутивов Linux
+
+    # Копирование файла приложения Flask
+    - name: Копирование файла приложения Flask
+      copy:
+        src: /opt/simple-webapp-flask/app.py
+        dest: /opt/app.py
+        owner: root
+        group: root
+        mode: "0755"
+
+    # Запуск веб-сервера Flask
+    - name: Запуск веб-сервера Flask
+      command: "FLASK_APP=/opt/app.py flask run --host=0.0.0.0 --port=8080"
+      async: true
+      poll: 0
